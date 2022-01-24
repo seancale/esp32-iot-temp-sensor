@@ -1,0 +1,3 @@
+[submodule "main/lib/dht22"]
+	path = main/lib/dht22
+	url = https://github.com/seancale/dht22-esp-idf
