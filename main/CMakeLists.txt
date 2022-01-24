@@ -1,5 +1,5 @@
 idf_component_register(SRCS "main.c"
-                            "lib/dht22/src/DHT_c.c"
-                    INCLUDE_DIRS "."
-                                 "lib/dht22/include")
+                    INCLUDE_DIRS ".")
 
+add_subdirectory(lib/dht22)
+target_link_libraries(${COMPONENT_LIB} PUBLIC dht22-esp-idf)
