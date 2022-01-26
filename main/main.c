@@ -1,12 +1,3 @@
-/* Wi-Fi Provisioning Manager Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-
 #include <stdio.h>
 #include <string.h>
 
@@ -18,8 +9,14 @@
 #include <esp_wifi.h>
 #include <esp_event.h>
 #include <nvs_flash.h>
+#include <wifi_provisioning/manager.h>
+
+#ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_BLE
+#include <wifi_provisioning/scheme_ble.h>
+#endif
 
 #include <wifi.c>
+#include <http.c>
 
 void app_main(void) {
     /* Initialize NVS partition */
@@ -47,9 +44,7 @@ void app_main(void) {
 
     /* Initialize Wi-Fi including netif with default config */
     esp_netif_create_default_wifi_sta();
-#ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_SOFTAP
-    esp_netif_create_default_wifi_ap();
-#endif /* CONFIG_EXAMPLE_PROV_TRANSPORT_SOFTAP */
+
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
@@ -60,9 +55,6 @@ void app_main(void) {
 #ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_BLE
         .scheme = wifi_prov_scheme_ble,
 #endif /* CONFIG_EXAMPLE_PROV_TRANSPORT_BLE */
-#ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_SOFTAP
-        .scheme = wifi_prov_scheme_softap,
-#endif /* CONFIG_EXAMPLE_PROV_TRANSPORT_SOFTAP */
 
     /* Any default scheme specific event handler that you would
          * like to choose. Since our example application requires
@@ -75,9 +67,6 @@ void app_main(void) {
 #ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_BLE
         .scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM
 #endif /* CONFIG_EXAMPLE_PROV_TRANSPORT_BLE */
-#ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_SOFTAP
-        .scheme_event_handler = WIFI_PROV_EVENT_HANDLER_NONE
-#endif /* CONFIG_EXAMPLE_PROV_TRANSPORT_SOFTAP */
     };
 
     /* Initialize provisioning manager with the
@@ -92,7 +81,7 @@ void app_main(void) {
     if (!provisioned) {
       do_provision();
     } else {
-        ESP_LOGI(TAG, "Already provisioned, starting Wi-Fi STA");
+        ESP_LOGI(TAG, "Already provisioned, reconnecting");
 
         /* We don't need the manager as device is already provisioned,
          * so let's release it's resources */
@@ -105,9 +94,5 @@ void app_main(void) {
     /* Wait for Wi-Fi connection */
     xEventGroupWaitBits(wifi_event_group, WIFI_CONNECTED_EVENT, false, true, portMAX_DELAY);
 
-    /* Start main application now */
-    while (1) {
-        ESP_LOGI(TAG, "Hello World!");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
+    http_init();
 }

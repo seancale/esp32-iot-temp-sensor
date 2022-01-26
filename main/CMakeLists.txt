@@ -1,5 +1,6 @@
 idf_component_register(SRCS "main.c"
                             "wifi.c"
+                            "http.c"
                     INCLUDE_DIRS ".")
 
 add_subdirectory(lib/dht22)
