@@ -1,4 +1,4 @@
-menu "Example Configuration"
+menu "esp32-iot-temp-sensor config"
 
     choice EXAMPLE_PROV_TRANSPORT
         bool "Provisioning Transport"
@@ -43,4 +43,9 @@ menu "Example Configuration"
         default y
         help
             Show the QR code for provisioning.
+
+    config DHT_GPIO_PIN
+        int
+        default 4
+        prompt "Which data pin is the DHT22 connected to? (default: 4 for pin D4)"
 endmenu

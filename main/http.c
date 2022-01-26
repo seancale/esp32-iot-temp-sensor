@@ -11,17 +11,26 @@
 #include "esp_eth.h"
 #include "esp_tls_crypto.h"
 #include <esp_http_server.h>
+#include "lib/dht22/include/DHT.h"
 
 static const char *TAG_HTTP = "http-server";
+int ret = 0;
 
 /* An HTTP GET handler */
-static esp_err_t hello_get_handler(httpd_req_t *req) {
-    /* Set some custom headers */
+static esp_err_t read_sensor_handler(httpd_req_t *req) {
+    //Setting JSON content type
     httpd_resp_set_hdr(req, "Content-Type", "application/json");
 
-    /* Send response with custom headers and body set as the
-     * string passed in user context*/
-    httpd_resp_send(req, "{\"test\":\"stuff\"}", HTTPD_RESP_USE_STRLEN);
+    //Reading DHT22
+    int ret = readDHT();
+    errorHandler(ret);
+
+    //Constructing response
+    char buf[256];
+    snprintf(buf, 256, "{\"humidity\":%.1f,\"temp\":%.1f}", getHumidity(), getTemperature());
+
+    //Sending response
+    httpd_resp_send(req, buf, HTTPD_RESP_USE_STRLEN);
 
     return ESP_OK;
 }
@@ -29,7 +38,7 @@ static esp_err_t hello_get_handler(httpd_req_t *req) {
 static const httpd_uri_t hello = {
     .uri       = "/",
     .method    = HTTP_GET,
-    .handler   = hello_get_handler,
+    .handler   = read_sensor_handler,
     .user_ctx  = NULL
 };
 
@@ -79,6 +88,9 @@ static void connect_handler(void* arg, esp_event_base_t event_base, int32_t even
 }
 
 void http_init(void) {
+    //DHT22 init
+    setDHTgpio(CONFIG_DHT_GPIO_PIN);
+
     static httpd_handle_t server = NULL;
 
     /* Register event handlers to stop the server when Wi-Fi or Ethernet is disconnected,

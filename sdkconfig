@@ -126,7 +126,7 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 
 #
-# Example Configuration
+# esp32-iot-temp-sensor config
 #
 CONFIG_EXAMPLE_PROV_TRANSPORT_BLE=y
 # CONFIG_EXAMPLE_PROV_TRANSPORT_SOFTAP is not set
@@ -134,7 +134,8 @@ CONFIG_EXAMPLE_PROV_TRANSPORT=1
 CONFIG_EXAMPLE_RESET_PROV_MGR_ON_FAILURE=y
 CONFIG_EXAMPLE_PROV_MGR_MAX_RETRY_CNT=5
 CONFIG_EXAMPLE_PROV_SHOW_QR=y
-# end of Example Configuration
+CONFIG_DHT_GPIO_PIN=4
+# end of esp32-iot-temp-sensor config
 
 #
 # Compiler options
