@@ -18,12 +18,17 @@ int ret = 0;
 
 /* An HTTP GET handler */
 static esp_err_t read_sensor_handler(httpd_req_t *req) {
+    //TODO: add some sort of pre-shared key so that readings can't be spammed constantly and cause a DoS
     //Setting JSON content type
     httpd_resp_set_hdr(req, "Content-Type", "application/json");
 
     //Reading DHT22
-    int ret = readDHT();
-    errorHandler(ret);
+    ret = readDHT();
+    if (ret != DHT_OK) {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "{\"error\":\"DHT error\"}");
+        errorHandler(ret);
+        return ESP_FAIL;
+    }
 
     //Constructing response
     char buf[256];
@@ -90,6 +95,9 @@ static void connect_handler(void* arg, esp_event_base_t event_base, int32_t even
 void http_init(void) {
     //DHT22 init
     setDHTgpio(CONFIG_DHT_GPIO_PIN);
+    //Getting initial reading
+    ret = readDHT();
+    errorHandler(ret);
 
     static httpd_handle_t server = NULL;
 
