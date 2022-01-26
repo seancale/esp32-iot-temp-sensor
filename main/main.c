@@ -1,20 +1,14 @@
 #include <stdio.h>
 #include <string.h>
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
-
 #include <esp_log.h>
 #include <esp_wifi.h>
 #include <esp_event.h>
 #include <nvs_flash.h>
 #include <wifi_provisioning/manager.h>
-
-#ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_BLE
 #include <wifi_provisioning/scheme_ble.h>
-#endif
-
 #include <wifi.c>
 #include <http.c>
 
@@ -50,23 +44,8 @@ void app_main(void) {
 
     /* Configuration for the provisioning manager */
     wifi_prov_mgr_config_t config = {
-    /* What is the Provisioning Scheme that we want ?
-         * wifi_prov_scheme_softap or wifi_prov_scheme_ble */
-#ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_BLE
         .scheme = wifi_prov_scheme_ble,
-#endif /* CONFIG_EXAMPLE_PROV_TRANSPORT_BLE */
-
-    /* Any default scheme specific event handler that you would
-         * like to choose. Since our example application requires
-         * neither BT nor BLE, we can choose to release the associated
-         * memory once provisioning is complete, or not needed
-         * (in case when device is already provisioned). Choosing
-         * appropriate scheme specific event handler allows the manager
-         * to take care of this automatically. This can be set to
-         * WIFI_PROV_EVENT_HANDLER_NONE when using wifi_prov_scheme_softap*/
-#ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_BLE
         .scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM
-#endif /* CONFIG_EXAMPLE_PROV_TRANSPORT_BLE */
     };
 
     /* Initialize provisioning manager with the
@@ -81,7 +60,7 @@ void app_main(void) {
     if (!provisioned) {
       do_provision();
     } else {
-        ESP_LOGI(TAG, "Already provisioned, reconnecting");
+        ESP_LOGI(TAG_WIFI, "Already provisioned, reconnecting");
 
         /* We don't need the manager as device is already provisioned,
          * so let's release it's resources */
