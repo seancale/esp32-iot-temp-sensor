@@ -25,3 +25,25 @@ sensor:
     humidity:
       name: "RENAME ME Humidity" #The humidity sensor that shows up in Home Assistant
     model: DHT22
+     
+  - platform: wifi_signal
+    name: "Sean ESP32 01 WiFi Signal"
+    update_interval: 60s
+    
+light:
+  - platform: monochromatic
+    name: "RENAME ME Built-in LED"
+    output: builtin_led_output
+    effects:
+      - pulse:
+          name: "Fast Pulse"
+          transition_length: 0.5s
+          update_interval: 0.5s
+      - pulse:
+          name: "Slow Pulse"
+          update_interval: 2s
+    
+output:
+  - id: builtin_led_output
+    platform: ledc
+    pin: GPIO2
