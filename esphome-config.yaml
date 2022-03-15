@@ -1,3 +1,6 @@
+substitutions:
+  friendly_name: "RENAME ME" #This is the name that shows up in Home Assistant
+
 esphome:
   name: rename-me-please #Change this to whatever you named your device in ESPHome
 
@@ -11,7 +14,7 @@ logger:
 api:
 
 ota:
-  password: "[CHANGE THIS BEFORE USE]" #This is mandatory for your device to recieve updates wirelessly
+  password: !secret rename_me_ota_password
 
 wifi:
   ssid: !secret wifi_ssid
@@ -21,18 +24,18 @@ sensor:
   - platform: dht
     pin: GPIO4
     temperature:
-      name: "RENAME ME Temperature" #The temperature sensor that shows up in Home Assistant
+      name: "${friendly_name} Temperature" #The temperature sensor that shows up in Home Assistant
     humidity:
-      name: "RENAME ME Humidity" #The humidity sensor that shows up in Home Assistant
+      name: "${friendly_name} Humidity" #The humidity sensor that shows up in Home Assistant
     model: DHT22
      
   - platform: wifi_signal
-    name: "RENAME ME WiFi Signal"
+    name: "${friendly_name} WiFi Signal"
     update_interval: 60s
     
 light:
   - platform: monochromatic
-    name: "RENAME ME Built-in LED"
+    name: "${friendly_name} Built-in LED"
     output: builtin_led_output
     effects:
       - pulse:
